@@ -1,24 +1,92 @@
-// Your bot's behaviour. Add commands here; grammY's docs (grammy.dev) cover
-// keyboards, sessions, files, inline queries and everything else.
-
 import { InlineKeyboard } from "grammy"
 
+const ADMIN = "@Arfatvai8090"
+
 export function registerCommands(bot) {
-  bot.command("start", (ctx) =>
-    ctx.reply(`Hi ${ctx.from?.first_name ?? "there"}. I am alive and hosted on FadeHost. Send /help to see what I can do.`, {
-      reply_markup: new InlineKeyboard().text("Ping me", "ping"),
-    }),
+
+  bot.command("start", async (ctx) => {
+    const keyboard = new InlineKeyboard()
+      .text("💵 Sell Option", "sell")
+      .row()
+      .text("🆘 Help Line", "help")
+
+    await ctx.reply(
+      `🤝 ভাই সেল গ্রুপ থেকে আপনাকে স্বাগতম!
+
+সবাই সততা এবং বিশ্বাসের সাথে লেনদেন করবেন।
+
+💵 লেনদেনের সীমা: $1 - $100
+
+⚠️ সতর্কতা:
+কোনো থার্ড পার্টির সাথে লেনদেন করবেন না।
+নিয়ম ভঙ্গ করলে অ্যাডমিন ব্যবস্থা নিতে পারবেন।
+
+নিচের মেনু থেকে অপশন নির্বাচন করুন:`,
+      { reply_markup: keyboard }
+    )
+  })
+
+  bot.callbackQuery("sell", async (ctx) => {
+    await ctx.answerCallbackQuery()
+
+    const keyboard = new InlineKeyboard()
+      .text("🔗 Binance UID", "1254966896")
+      .row()
+      .text("🌐 BEP20", "0x1652293fa63b6a514adceadbcc5939b4c72dc5f3")
+      .row()
+      .text("🔙 Back", "back")
+
+    await ctx.reply("আপনার ডলার গ্রহণের মাধ্যম নির্বাচন করুন:", {
+      reply_markup: keyboard
+    })
+  })
+
+  bot.callbackQuery(["uid", "trc20"], async (ctx) => {
+    await ctx.answerCallbackQuery()
+
+    const method = ctx.callbackQuery.data === "uid"
+      ? "Binance 1254966896"
+      : "BEP20 0x1652293fa63b6a514adceadbcc5939b4c72dc5f3"
+
+    await ctx.reply(
+      `আপনি ${method} নির্বাচন করেছেন।
+
+আপনার ${method} তথ্য এবং ডলারের পরিমাণ লিখুন।
+
+উদাহরণ:
+Amount: 10
+UID: আপনার UID
+
+লেনদেনের তথ্য অ্যাডমিন যাচাই করবেন।`
+    )
+  })
+
+  bot.callbackQuery("help", async (ctx) => {
+    await ctx.answerCallbackQuery()
+
+    await ctx.reply(
+      `🆘 ভাই সেল Help Line
+
+যেকোনো সমস্যায় যোগাযোগ করুন:
+
+👤 Admin: ${ADMIN @Arfatvai8090} 
+
+সতর্ক থাকুন। অপরিচিত কারো সাথে লেনদেন করবেন না।`
+    )
+  })
+
+  bot.callbackQuery("back", async (ctx) => {
+    await ctx.answerCallbackQuery()
+    await ctx.reply("মূল মেনুতে ফিরতে /start লিখুন।")
+  })
+
+  bot.command("help", (ctx) => {
+    ctx.reply(`🆘 Help Line: ${ADMIN}`)
+  })
+
+  bot.command("ping", (ctx) => ctx.reply("Bot is running ✅"))
+
+  bot.command("id", (ctx) =>
+    ctx.reply(`Your ID: ${ctx.from?.id}`)
   )
-
-  bot.command("help", (ctx) =>
-    ctx.reply(["Commands:", "/start  say hello", "/help   this list", "/ping   check I am awake", "/id     show chat and user ids", "", "Send me any text and I echo it back."].join("\n")),
-  )
-
-  bot.command("ping", (ctx) => ctx.reply("pong"))
-
-  bot.command("id", (ctx) => ctx.reply(`Chat id: ${ctx.chat.id}\nYour id: ${ctx.from?.id ?? "unknown"}`))
-
-  bot.callbackQuery("ping", (ctx) => ctx.answerCallbackQuery({ text: "pong" }))
-
-  bot.on("message:text", (ctx) => ctx.reply(ctx.message.text))
-}
+    }
