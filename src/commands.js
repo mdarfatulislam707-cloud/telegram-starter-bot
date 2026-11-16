@@ -1,24 +1,99 @@
-// Your bot's behaviour. Add commands here; grammY's docs (grammy.dev) cover
-// keyboards, sessions, files, inline queries and everything else.
 
 import { InlineKeyboard } from "grammy"
 
 export function registerCommands(bot) {
-  bot.command("start", (ctx) =>
-    ctx.reply(`Hi ${ctx.from?.first_name ?? "there"}. I am alive and hosted on FadeHost. Send /help to see what I can do.`, {
-      reply_markup: new InlineKeyboard().text("Ping me", "ping"),
-    }),
-  )
+
+  const mainMenu = new InlineKeyboard()
+    .text("🟢 BUY", "buy")
+    .text("🔴 SELL", "sell")
+    .row()
+    .text("📋 My Orders", "orders")
+    .text("📞 Support", "support")
+    .row()
+    .text("ℹ️ Help", "help")
+
+  bot.command("start", async (ctx) => {
+    await ctx.reply(
+      `👋 Welcome to BUY & SELL SERVICE
+
+💱 Digital Order Information Center
+
+নিচের মেনু থেকে একটি অপশন নির্বাচন করুন।
+
+🟢 BUY - Buy information
+🔴 SELL - Sell information
+📋 My Orders - Order information
+📞 Support - Contact Admin`,
+      { reply_markup: mainMenu }
+    )
+  })
+
+  bot.callbackQuery("buy", async (ctx) => {
+    await ctx.answerCallbackQuery()
+    await ctx.reply(
+      `🟢 BUY INFORMATION
+
+আপনার Buy সংক্রান্ত তথ্য লিখুন।
+
+নিরাপদে অর্ডার যাচাইয়ের জন্য অ্যাডমিনের সঙ্গে যোগাযোগ করুন।
+
+📞 Support: @Arfatvai8090`,
+      { reply_markup: new InlineKeyboard().text("🔙 Main Menu", "home") }
+    )
+  })
+
+  bot.callbackQuery("sell", async (ctx) => {
+    await ctx.answerCallbackQuery()
+    await ctx.reply(
+      `🔴 SELL INFORMATION
+
+আপনার Sell সংক্রান্ত তথ্য লিখুন।
+
+কোনো পেমেন্ট বা সম্পদ পাঠানোর আগে তথ্য যাচাই করুন।
+
+📞 Support: @Arfatvai8090`,
+      { reply_markup: new InlineKeyboard().text("🔙 Main Menu", "home") }
+    )
+  })
+
+  bot.callbackQuery("orders", async (ctx) => {
+    await ctx.answerCallbackQuery()
+    await ctx.reply(
+      "📋 ORDER INFORMATION\n\nএখনো কোনো অর্ডার সংরক্ষিত নেই।",
+      { reply_markup: new InlineKeyboard().text("🔙 Main Menu", "home") }
+    )
+  })
+
+  bot.callbackQuery("support", async (ctx) => {
+    await ctx.answerCallbackQuery()
+    await ctx.reply(
+      "📞 SUPPORT\n\nAdmin: @Arfatvai8090"
+    )
+  })
+
+  bot.callbackQuery("help", async (ctx) => {
+    await ctx.answerCallbackQuery()
+    await ctx.reply(
+      "ℹ️ HELP\n\n/start - Main Menu\n/help - Help\n/id - Your ID"
+    )
+  })
+
+  bot.callbackQuery("home", async (ctx) => {
+    await ctx.answerCallbackQuery()
+    await ctx.reply("🏠 MAIN MENU", {
+      reply_markup: mainMenu
+    })
+  })
 
   bot.command("help", (ctx) =>
-    ctx.reply(["Commands:", "/start  say hello", "/help   this list", "/ping   check I am awake", "/id     show chat and user ids", "", "Send me any text and I echo it back."].join("\n")),
+    ctx.reply("ব্যবহার: /start দিয়ে মেনু খুলুন।")
   )
 
-  bot.command("ping", (ctx) => ctx.reply("pong"))
+  bot.command("id", (ctx) =>
+    ctx.reply(`Your ID: ${ctx.from.id}`)
+  )
 
-  bot.command("id", (ctx) => ctx.reply(`Chat id: ${ctx.chat.id}\nYour id: ${ctx.from?.id ?? "unknown"}`))
-
-  bot.callbackQuery("ping", (ctx) => ctx.answerCallbackQuery({ text: "pong" }))
-
-  bot.on("message:text", (ctx) => ctx.reply(ctx.message.text))
+  bot.command("ping", (ctx) =>
+    ctx.reply("🟢 Bot is running!")
+  )
 }
